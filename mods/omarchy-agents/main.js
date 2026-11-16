@@ -148,7 +148,8 @@ export default class Agents extends View {
     const on = sortOf().id;
     return v_flex()
       .w_full()
-      .p(5)
+      .p(4)
+      .border_1().border_color(t.border).rounded(0)
       .bg(t.popover)
       .text_size(12)
       .child(div().px(8).pt(4).pb(6).text_size(11).text_color(t.dim).child("sort agents"))
@@ -507,7 +508,7 @@ export default class Agents extends View {
                 .rounded(0)
                 .text_color(t.dim)
                 .hover((s) => s.bg(t.foreground + "14").text_color(t.foreground))
-                .on_click(() => openOverlay({ mod: "omarchy-agents", kind: "popup", width: 200, height: 140, props: { sortMenu: true } }))
+                .on_click(() => openOverlay({ frame: "none", mod: "omarchy-agents", kind: "popup", width: 200, height: 140, props: { sortMenu: true } }))
                 .tooltip(`Sort agents: ${sort.label}`)
                 .child(svg(`mods/omarchy-chrome/${sort.icon}.svg`).size(14)),
             ),

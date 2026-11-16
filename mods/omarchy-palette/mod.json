@@ -1,1 +1,1 @@
-{ "place": "none", "title": "Command palette", "overlay": {"width": 660, "height": 450} }
+{ "place": "none", "title": "Command palette", "overlay": {"frame":"none","width": 660, "height": 450} }

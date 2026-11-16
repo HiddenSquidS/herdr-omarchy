@@ -277,14 +277,15 @@ export default class MachineAdd extends View {
     const hosts = this.hosts ?? [];
     return v_flex()
       .id("machine-add")
+      .border_2().border_color(t.accent).rounded(0)
       .track_focus(this.handle)
       .on_key_down((e, cx) => this.key(e, cx))
       .w_full()
       .min_h(0)
-      .p(18)
+      .p(12)
       .bg(t.popover)
       .text_color(t.foreground)
-      .child(h_flex().items_center().child(div().flex_1().text_size(15).font_semibold().child("Add a machine")).child(div().id("ma-esc").px(6).py(2).rounded(0).text_size(11).text_color(t.dim).cursor_pointer().hover((s) => s.bg(t.hover).text_color(t.foreground)).on_click(() => this.close()).child("Esc")))
+      .child(h_flex().items_center().child(div().flex_1().text_size(12).font_semibold().text_color(t.accent).child("ADD A MACHINE")).child(div().id("ma-esc").px(6).py(2).rounded(0).text_size(11).text_color(t.dim).cursor_pointer().hover((s) => s.bg(t.hover).text_color(t.foreground)).on_click(() => this.close()).child("Esc")))
       .child(
         div()
           .pt(6)

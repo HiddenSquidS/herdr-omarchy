@@ -527,7 +527,7 @@ export default class ModManager extends View {
     const fill = style === "primary" ? p.solid : p.bg;
     const color = style === "primary" ? p.solidFg : style === "danger" ? p.warn : p.fg;
     return h_flex().id(id).role("button").accessibility_label(key ? `${label}, key ${key}` : label)
-      .h(36).px(14).gap(10).items_center().justify_between().rounded(0).flex_none().cursor_pointer()
+      .h(32).px(12).gap(8).items_center().justify_between().rounded(0).flex_none().cursor_pointer()
       .bg(fill).border_1().border_color(style === "danger" ? p.warn : style === "primary" ? p.solid : p.border)
       .hover((s) => (style === "plain" ? s.bg(p.hover) : s.opacity(0.88)))
       .text_size(12.5).font_semibold().text_color(color)
@@ -548,7 +548,7 @@ export default class ModManager extends View {
   }
 
   card(p, children) {
-    return v_flex().p(20).gap(16).rounded(0).bg(p.card).border_1().border_color(p.border).children(children);
+    return v_flex().p(16).gap(12).rounded(0).bg(p.card).border_1().border_color(p.border).children(children);
   }
 
   tab(p, id, label, count, active, onClick) {
@@ -607,13 +607,13 @@ export default class ModManager extends View {
   searchBox(p) {
     const market = this.mode === "market";
     if (this.asking) {
-      return h_flex().h(46).px(14).gap(12).items_center().rounded(0).border_2().border_color(p.bar).bg(p.bg)
+      return h_flex().h(36).px(12).gap(10).items_center().rounded(0).border_2().border_color(p.bar).bg(p.bg)
         .child(div().flex_none().text_size(12.5).font_semibold().text_color(p.accent).child(`Ask AI to change ${this.asking.name}:`))
         .child(Input.new(this.askInput).flex_1().h_full().text_size(12.5).text_color(p.fg))
         .child(this.keycap(p, "enter")).child(this.keycap(p, "esc"));
     }
     if (!this.searching && !(market ? this.market.query : this.filter)) return div();
-    return h_flex().id("search").h(46).px(14).gap(12).items_center().rounded(0).border_1()
+    return h_flex().id("search").h(36).px(12).gap(10).items_center().rounded(0).border_1()
       .border_color(this.searching ? p.bar : p.input).bg(p.bg).cursor_pointer()
       .on_click((_e, cx) => { if (!this.searching) { this.startSearch(); cx.notify(); } })
       .child(div().text_size(12.5).text_color(p.muted).child(market ? "Search" : "Filter"))
@@ -624,7 +624,7 @@ export default class ModManager extends View {
   }
 
   footer(p) {
-    return h_flex().gap(18).items_center().flex_wrap().mx(-28).mb(-24).px(28).py(12).bg(p.card).border_t_1().border_color(p.border).children(
+    return h_flex().gap(18).items_center().flex_wrap().mx(-20).mb(-16).px(20).py(10).bg(p.card).border_t_1().border_color(p.border).children(
       HINTS[this.mode].map(([key, what]) => h_flex().gap(6).items_center()
         .child(this.keycap(p, key)).child(div().text_size(11.5).text_color(p.muted).child(what))));
   }
@@ -816,7 +816,7 @@ export default class ModManager extends View {
     return div().id("stage").size_full().flex().items_center().justify_center().bg("#000000b3")
       .on_size_change((size, cx) => { this.size = size; cx.notify(); })
       .child(v_flex().id("root").role("dialog").accessibility_label("Mod Manager").track_focus(this.handle).w(w).h(h)
-        .px(28).pt(22).pb(24).gap(18).bg(p.bg).border_2().border_color(p.bar).text_size(12.5).text_color(p.fg).overflow_hidden()
+        .px(20).pt(16).pb(16).gap(14).bg(p.bg).border_2().border_color(p.bar).text_size(12.5).text_color(p.fg).overflow_hidden()
         .on_key_down((e, cx) => this.onKey(e, cx))
         .child(this.header(p))
         .child(this.banner(p) ?? div())

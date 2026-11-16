@@ -200,11 +200,12 @@ export default class Picker extends View {
 
     return v_flex()
       .id("picker")
+      .border_2().border_color(t.accent).rounded(0)
       .track_focus(this.handle)
       .w_full()
       .min_h(0)
-      .p(18)
-      .gap(10)
+      .p(12)
+      .gap(8)
       .bg(t.popover)
       .text_size(13)
       .on_key_down((e, cx) => {
@@ -221,7 +222,7 @@ export default class Picker extends View {
         cx.stop_propagation();
         cx.notify();
       })
-      .child(h_flex().items_center().child(div().flex_1().text_size(15).font_semibold().text_color(t.foreground).child("Go to…")).child(div().id("picker-esc").px(6).py(2).rounded(0).text_size(11).text_color(t.dim).cursor_pointer().hover((s) => s.bg(t.hover).text_color(t.foreground)).on_click(() => this.close()).child("Esc")))
+      .child(h_flex().items_center().child(div().flex_1().text_size(12).font_semibold().text_color(t.accent).child("GO TO")).child(div().id("picker-esc").px(6).py(2).rounded(0).text_size(11).text_color(t.dim).cursor_pointer().hover((s) => s.bg(t.hover).text_color(t.foreground)).on_click(() => this.close()).child("Esc")))
       .child(
         h_flex().h(36).flex_none().px(10).gap(8).items_center().rounded(0).border_1().border_color(t.accent).bg(t.background)
           .child(svg("mods/omarchy-picker/search.svg").size(15).text_color(t.dim))

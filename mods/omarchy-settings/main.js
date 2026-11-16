@@ -436,25 +436,29 @@ export default class Settings extends View {
     const waiting = Boolean(u.app.ready || (u.core.ready && !u.core.managed));
     const nav = v_flex()
       .flex_none()
-      .w(190)
-      .p(10)
-      .gap(2)
+      .w(176)
+      .p(12)
+      .gap(4)
+      .bg(t.chrome)
       .border_r(1)
       .border_color(t.border)
-      .child(div().px(10).pt(6).pb(12).text_size(16).font_semibold().text_color(t.foreground).child("Settings"))
+      .child(div().px(8).pt(4).text_size(10.5).font_semibold().text_color(t.accent).child("OMARCHY"))
+      .child(div().px(8).pt(2).pb(12).text_size(18).font_semibold().text_color(t.foreground).child("Settings"))
       .children(
         SECTIONS.map((s) => {
           const on = s.id === this.section;
           return h_flex()
             .id(`st-s-${s.id}`)
-            .gap(10)
+            .role("tab").aria_selected(on).accessibility_label(s.title)
+            .border_l(2).border_color(on ? t.accent : "#00000000")
+            .gap(8)
             .px(10)
-            .py(7)
+            .h(32)
             .items_center()
             .rounded(0)
             .cursor_pointer()
-            .bg(on ? t.raised : "#00000000")
-            .hover((st) => st.bg(t.raised))
+            .bg(on ? t.selected : "#00000000")
+            .hover((st) => st.bg(t.hover))
             .on_click((_e, cx) => {
               this.section = s.id;
               this.picking = null;
@@ -464,15 +468,17 @@ export default class Settings extends View {
               cx.notify();
             })
             .child(svg(I(s.icon)).size(15).text_color(on ? t.accent : t.dim))
-            .child(div().flex_1().text_size(13.5).text_color(on ? t.foreground : t.muted).child(s.title))
+            .child(div().flex_1().text_size(12.5).text_color(on ? t.foreground : t.muted).child(s.title))
             .when(s.id === "updates" && waiting, (el) => el.child(div().w(7).h(7).rounded(0).bg(t.accent)));
         }),
       );
     return h_flex()
       .id("settings")
+      .role("dialog").accessibility_label("Omarchy settings")
+      .border_2().border_color(t.accent).rounded(0)
       .track_focus(this.handle)
       .w_full()
-      .h(620)
+      .h_full()
       .min_h(0)
       .items_start()
       .bg(t.popover)
@@ -494,7 +500,9 @@ export default class Settings extends View {
         cx.stop_propagation();
         cx.notify();
       })
-      .child(nav.h_full().child(div().flex_1()).child(button(t, "st-feedback", "Send feedback", () => { closeOverlay(props()?.overlay); run("app.feedback"); })))
+      .child(nav.h_full().child(div().flex_1())
+        .child(button(t, "st-feedback", "Send feedback", () => { closeOverlay(props()?.overlay); run("app.feedback"); }))
+        .child(button(t, "st-close", "Close · Esc", () => this.close())))
       .child(
         // A bar that always shows: the pages are taller than the dialog and
         // people should see that they scroll.
@@ -512,8 +520,8 @@ export default class Settings extends View {
               // content and a page that fits still shows a bar.
               .child(
                 div()
-                  .px(28)
-                  .py(22)
+                  .px(20)
+                  .py(16)
                   .child(
                     this.section === "look"
                       ? look(this, t, cx)

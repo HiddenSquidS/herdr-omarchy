@@ -79,7 +79,8 @@ export default class OmarchyKeys extends View {
         .child(div().text_size(11).font_semibold().child(`${title(section, layout).toUpperCase()} · CAME WITH ${layout.toUpperCase()}`))
         .child(div().text_size(11).text_color(t.dim).child(`${size(section)} keys`)))
       .children(open(section) ? rows(section) : []);
-    return v_flex().id("omarchy-keys").size_full().min_h(0).p(16).gap(10).bg(t.popover).text_color(t.foreground)
+    return v_flex().id("omarchy-keys")
+      .border_2().border_color(t.accent).rounded(0).size_full().min_h(0).p(12).gap(10).bg(t.popover).text_color(t.foreground)
       .on_key_down((e, cx) => { if (e.key === "escape") { closeOverlay(props().overlay); cx.stop_propagation(); } })
       .child(h_flex().h(34).flex_none().px(10).gap(10).items_center().border_1().border_color(t.accent).bg(t.background)
         .child(svg("mods/omarchy-keys/keyboard.svg").size(15).text_color(t.dim))
