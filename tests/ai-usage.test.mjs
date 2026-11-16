@@ -290,8 +290,6 @@ test('Omarchy quota uses fractional percentages and retains the collector fetche
   assert.ok(Math.abs(Date.now() - now) < 1000);
   assert.deepEqual(h.reads, [omarchyCachePath, omarchyCachePath]);
   assert.equal(h.requests.length, 0);
-  const text = new h.AiUsage().tip(omarchySource);
-  assert.match(text, /Omarchy's ChatGPT subscription; OpenCode account not verified/);
 });
 
 test('Omarchy cache accepts one valid supported window', async () => {
@@ -646,4 +644,23 @@ test('a Claude tab follows the profile its terminal runs now, not one cached ear
   live.focused = { tab: 'b' };
   live.panes = [{ tab: 'b', terminal: 't2', focused: true, program: { key: 'claude', name: 'Claude', icon: 'claude.svg', agent: true } }];
   assert.deepEqual(await shown(), ['claude.personal']);
+});
+
+
+test('quota meters open details on click without a hover tooltip', () => {
+  const h = usageHarness();
+  const usage = new h.AiUsage();
+  let pressed, clicked, opened = 0, stopped = false;
+  const element = {
+    on_mouse_down(button, handler) { assert.equal(button, 'left'); pressed = handler; return this; },
+    on_click(handler) { clicked = handler; return this; },
+  };
+  usage.open = () => { opened++; };
+  assert.equal(usage.clickable(element), element);
+  const bounds = { x: 4, y: 8, width: 160, height: 30 };
+  pressed({ bounds }, { stop_propagation() { stopped = true; } });
+  clicked();
+  assert.equal(usage.anchor, bounds);
+  assert.equal(stopped, true);
+  assert.equal(opened, 1);
 });
