@@ -1,5 +1,6 @@
 // The right-click menu, opened as a popup at the pointer with props
 // { role: "menu", target, ctx }. Styled like Herdr's own menu.
+import { surface, menuRow } from "../ui.js";
 import { div, svg, image } from "gpui-kit";
 import { v_flex, h_flex } from "gpui-base";
 import { props, closeOverlay, notify, theme, run } from "herdr";
@@ -56,7 +57,7 @@ export class Menu {
 
   render(cx) {
     const t = theme();
-    return v_flex().id("git-graph-menu").track_focus(this.handle).w_full().min_h(0).p(4).border_1().border_color(t.border).rounded(0).bg(t.popover).text_size(12.8)
+    return surface(t, v_flex(), "menu").id("git-graph-menu").track_focus(this.handle).w_full().min_h(0).p(4).text_size(12.8)
       .on_key_down((e, cx) => {
         if (e.key === "down") this.move(1);
         else if (e.key === "up") this.move(-1);
@@ -68,9 +69,8 @@ export class Menu {
       })
       .children(this.items.map((it, i) => it.separator
         ? div().mx(7).my(4).h(1).flex_none().bg(t.border)
-        : h_flex().id(`gm-${i}`).h(30).flex_none().px(8).gap(9).rounded(0).items_center().cursor_pointer()
+        : menuRow(t, h_flex(), i === this.at || this.busy === i).id(`gm-${i}`).h(30).flex_none().cursor_pointer()
           .text_color(it.action.type.startsWith("delete") ? t.ansi1 : t.foreground)
-          .when(i === this.at || this.busy === i, (el) => el.bg(t.selected)).hover((s) => s.bg(t.hover))
           .on_click((_e, cx) => this.choose(i, cx))
           // An agent's own icon keeps its colors when it isn't drawn tinted.
           .child(it.image ? image(it.icon).size(14).flex_none() : svg(icon(it.icon)).size(14).flex_none().text_color(it.action.type.startsWith("delete") ? t.ansi1 : t.muted))

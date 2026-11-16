@@ -1,5 +1,6 @@
 // App-owned settings mod. Writes changes immediately; no Save step.
 
+import { surface } from "./ui.js";
 import { View, div, svg } from "gpui-kit";
 import { v_flex, h_flex, Scrollbar, InputState, Input } from "gpui-base";
 import { hc, run, theme, updates, telemetry, appHome, readTextFile, writeTextFile, playSound, props, closeOverlay, window } from "herdr";
@@ -472,16 +473,14 @@ export default class Settings extends View {
             .when(s.id === "updates" && waiting, (el) => el.child(div().w(7).h(7).rounded(0).bg(t.accent)));
         }),
       );
-    return h_flex()
+    return surface(t, h_flex())
       .id("settings")
       .role("dialog").accessibility_label("Omarchy settings")
-      .border_2().border_color(t.accent).rounded(0)
       .track_focus(this.handle)
       .w_full()
       .h_full()
       .min_h(0)
       .items_start()
-      .bg(t.popover)
       .on_key_down((e, cx) => {
         const k = e.key;
         if (this.machineEdit) {

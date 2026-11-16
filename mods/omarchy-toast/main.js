@@ -2,6 +2,7 @@
 // level, icon, action }); replace this mod to restyle them all. Click to
 // run its action (e.g. go to the agent) and dismiss it.
 
+import { surface, UI } from "./ui.js";
 import { View, div, image } from "gpui-kit";
 import { v_flex, h_flex } from "gpui-base";
 import { props, closeOverlay, run, theme } from "herdr";
@@ -15,16 +16,14 @@ export default class Toast extends View {
     const color = t[DOT[p.level] ?? "accent"];
     const login = /^([a-z0-9][a-z0-9_.-]{0,31}) needs login; run hc machine login \1$/.exec(p.body ?? "");
     const command = login ? `hc machine login ${login[1]}` : null;
-    return h_flex()
+    return surface(t, h_flex(), "toast")
       .id("toast")
       .role(p.level === "error" ? "alert" : "status")
-      .border_1().border_color(t.border).rounded(0)
       .size_full()
-      .px(12)
+      .px(UI.padding)
       .py(8)
-      .gap(10)
+      .gap(UI.gap)
       .items_center()
-      .bg(t.popover)
       .cursor_pointer()
       .hover((s) => s.bg(t.hover))
       .on_click(() => {

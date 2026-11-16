@@ -68,3 +68,11 @@ It applies the patch only when it is not applied yet and says so when it is. Whe
 The debugging port listens on 127.0.0.1 only and Chrome refuses connections from web pages, but any program on the machine can drive that browser through it.
 
 Herdr's terminal draws only inline kitty images: frames sent as a file or through shared memory (`t=f`, `t=t`, `t=s`) are not drawn, so the page stream cannot skip the terminal.
+
+## Shared Omarchy UI
+
+Edit `ui/components.js` for surfaces, headings, controls, inputs and menu rows. Edit `ui/actions.js` for Omarchy dialog routing and `ui/scroll-rail.js` for the collapsed sidebar scroll component. Then run `npm run sync-ui` once to update every consumer.
+
+Herdr rejects imports outside a mod folder. `scripts/sync-ui.mjs` distributes the shared sources into each consuming mod as generated `ui.js` and `ui-actions.js`. Do not edit those generated copies. `npm test` checks that they match the sources. The distributed files keep each mod independently installable.
+
+`omarchy-dialog` supplies confirmation and text prompts. Its layout-owned controller handles rename shortcuts; dialog actions capture their target before opening. New-tab and worktree dialogs use `omarchy-new-menu` and `omarchy-worktree` rather than Herdr's built-in views.

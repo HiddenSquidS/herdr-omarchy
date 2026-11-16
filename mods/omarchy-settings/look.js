@@ -1,3 +1,4 @@
+import { inputFrame } from "./ui.js";
 import { div, svg, image } from "gpui-kit";
 import { v_flex, h_flex, Input } from "gpui-base";
 import { run, themes, fonts, settings, layouts, shared } from "herdr";
@@ -184,18 +185,12 @@ function themePicker(t, light) {
 // The font in use, written in itself; a click opens the list.
 function fontButton(view, t, which, family) {
   const open = view.picking === which;
-  return div()
+  return inputFrame(t, div(), open)
     .id(`st-f-${which}`)
     .w(220)
-    .h(32)
     .flex()
     .items_center()
-    .px(10)
     .overflow_hidden()
-    .rounded(0)
-    .border_1()
-    .border_color(open ? t.accent : t.border)
-    .bg(t.raised)
     .cursor_pointer()
     .hover((s) => s.bg(t.hover))
     .on_click((_e, cx) => {

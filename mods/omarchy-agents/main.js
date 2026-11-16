@@ -1,6 +1,7 @@
 // Agents in grouped or priority views; parents take their most urgent sub-agent's place.
 // A viewed done agent stays in Done until left.
 
+import { surface, menuRow } from "./ui.js";
 import { ScrollRail } from "./scroll-rail.js";
 import { View, div, image, svg } from "gpui-kit";
 import { requestClose } from "./close.js";
@@ -148,22 +149,13 @@ export default class Agents extends View {
 
   sortMenu(t) {
     const on = sortOf().id;
-    return v_flex()
+    return surface(t, v_flex(), "menu")
       .w_full()
       .p(4)
-      .border_1().border_color(t.border).rounded(0)
-      .bg(t.popover)
       .text_size(12)
       .child(div().px(8).pt(4).pb(6).text_size(11).text_color(t.dim).child("sort agents"))
-      .children(SORTS.map((s) => h_flex()
+      .children(SORTS.map((s) => menuRow(t, h_flex(), s.id === on)
         .id(`sort-${s.id}`)
-        .h(26)
-        .px(8)
-        .gap(9)
-        .rounded(0)
-        .items_center()
-        .text_color(t.foreground)
-        .hover((el) => el.bg(t.foreground + "14"))
         .on_click(() => {
           setShared("agents.sort", s.id);
           closeOverlay(props().overlay);

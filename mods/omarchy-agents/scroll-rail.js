@@ -1,3 +1,4 @@
+// Generated from ui/scroll-rail.js. Edit that source, then run npm run sync-ui.
 import { div, PathBuilder, Background } from "gpui-kit";
 import { v_flex } from "gpui-base";
 import { settings } from "herdr";

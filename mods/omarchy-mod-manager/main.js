@@ -2,6 +2,7 @@
 // install with a review of what each mod does, update, remove, and hand a mod to an AI agent to
 // change. Port of speardragon's herdr-plugin-manager (MIT) from herdr plugins to Herdr app mods.
 
+import { surface, button as uiButton, UI } from "./ui.js";
 import { View, div, uniform_list } from "gpui-kit";
 import { h_flex, v_flex, InputState, Input, Scrollbar, VirtualListScrollHandle } from "gpui-base";
 import { exec, appHome, readTextFile, writeTextFile, shared, setShared, props, closeOverlay, notify, theme, run, knownAgents, settings } from "herdr";
@@ -524,16 +525,11 @@ export default class ModManager extends View {
 
   // A clickable action. The key it also answers to is drawn as a keycap, and announced.
   button(p, id, label, key, onClick, style = "plain") {
-    const fill = style === "primary" ? p.solid : p.bg;
-    const color = style === "primary" ? p.solidFg : style === "danger" ? p.warn : p.fg;
-    return h_flex().id(id).role("button").accessibility_label(key ? `${label}, key ${key}` : label)
-      .h(32).px(12).gap(8).items_center().justify_between().rounded(0).flex_none().cursor_pointer()
-      .bg(fill).border_1().border_color(style === "danger" ? p.warn : style === "primary" ? p.solid : p.border)
-      .hover((s) => (style === "plain" ? s.bg(p.hover) : s.opacity(0.88)))
-      .text_size(12.5).font_semibold().text_color(color)
-      .on_click((_e, cx) => { this.handle.focus(); onClick(cx); cx.notify(); })
-      .child(label)
-      .when(Boolean(key), (el) => el.child(this.keycap(p, key, style === "primary")));
+    const t = { ...theme(), accent: p.solid, accent_foreground: p.solidFg, chrome: p.bg, foreground: p.fg, border: p.border, hover: p.hover };
+    return uiButton(t, id, label, (_e, cx) => { this.handle.focus(); onClick(cx); cx.notify(); }, style === "primary" ? "primary" : "secondary")
+      .accessibility_label(key ? `${label}, key ${key}` : label).gap(UI.gap).justify_between()
+      .when(style === "danger", el => el.border_color(p.warn).text_color(p.warn))
+      .when(Boolean(key), el => el.child(this.keycap(p, key, style === "primary")));
   }
 
   pill(p, text, color) {
@@ -810,13 +806,13 @@ export default class ModManager extends View {
   }
 
   render(_cx) {
-    const p = palette(theme());
+    const t = theme(), p = palette(t);
     // Full window over the dimmed app, one panel in the middle (at most 1180x780, as the window allows).
     const zoom = settings().zoom ?? 1, w = Math.min(1180, (this.size?.width ?? 1280) / zoom - 64), h = Math.min(780, (this.size?.height ?? 860) / zoom - 64);
-    return div().id("stage").size_full().flex().items_center().justify_center().bg("#000000b3")
+    return div().id("stage").size_full().flex().items_center().justify_center().bg(UI.scrim)
       .on_size_change((size, cx) => { this.size = size; cx.notify(); })
-      .child(v_flex().id("root").role("dialog").accessibility_label("Mod Manager").track_focus(this.handle).w(w).h(h)
-        .px(20).pt(16).pb(16).gap(14).bg(p.bg).border_2().border_color(p.bar).text_size(12.5).text_color(p.fg).overflow_hidden()
+      .child(surface(t, v_flex()).id("root").role("dialog").accessibility_label("Mod Manager").track_focus(this.handle).w(w).h(h)
+        .px(20).pt(16).pb(16).gap(14).text_size(12.5).text_color(p.fg).overflow_hidden()
         .on_key_down((e, cx) => this.onKey(e, cx))
         .child(this.header(p))
         .child(this.banner(p) ?? div())

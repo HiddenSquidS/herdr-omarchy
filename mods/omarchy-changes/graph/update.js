@@ -2,6 +2,7 @@
 // GitHub's public releases API: no token, nothing about the person or their
 // repositories. "Stop checking" in the update window turns it off for good, and
 // CHECK = false turns it off before it ever asks.
+import { surface, button as uiButton, UI } from "../ui.js";
 import { div } from "gpui-kit";
 import { v_flex, h_flex, TextView } from "gpui-base";
 import { props, shared, setShared, closeOverlay, openOverlay, theme, settings } from "herdr";
@@ -60,11 +61,8 @@ export class Update {
 
   render() {
     const t = theme(), latest = state().latest, close = () => closeOverlay(props().overlay);
-    const button = (id, text, primary, action) => h_flex().id(id).h(32).px(14).items_center().rounded(0).border_1()
-      .border_color(primary ? t.solid : t.input).bg(primary ? t.solid : t.raised)
-      .text_color(primary ? t.solid_foreground : t.foreground).text_size(12.5).font_medium().cursor_pointer()
-      .hover((st) => st.opacity(0.88)).on_click(action).child(text);
-    return v_flex().id("git-graph-update").track_focus(this.handle).size_full().min_h(0).p(12).border_2().border_color(t.accent).rounded(0).bg(t.popover).text_color(t.foreground).text_size(12.8)
+    const button = (id, text, primary, action) => uiButton(t, id, text, action, primary ? "primary" : "secondary");
+    return surface(t, v_flex()).id("git-graph-update").track_focus(this.handle).size_full().min_h(0).p(UI.padding).text_color(t.foreground).text_size(12.8)
       .on_key_down((e, cx) => { if (e.key === "escape") { close(); cx.stop_propagation(); } })
       .child(h_flex().items_center().child(div().flex_1().text_size(15).font_semibold().child(`Git Graph ${latest?.tag ?? ""} is out`))
         .child(div().text_size(11).text_color(t.dim).child("Esc")))

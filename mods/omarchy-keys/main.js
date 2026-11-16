@@ -1,6 +1,7 @@
 // Every key binding Herdr has (keys()), grouped by where it works, then by type.
 // Click a heading to fold it (remembered); typing a filter shows every match. Esc closes.
 
+import { surface, inputFrame, UI } from "./ui.js";
 import { View, div, svg } from "gpui-kit";
 import { v_flex, h_flex, InputState, Input } from "gpui-base";
 import { keys, theme, shared, props, closeOverlay } from "herdr";
@@ -79,10 +80,9 @@ export default class OmarchyKeys extends View {
         .child(div().text_size(11).font_semibold().child(`${title(section, layout).toUpperCase()} · CAME WITH ${layout.toUpperCase()}`))
         .child(div().text_size(11).text_color(t.dim).child(`${size(section)} keys`)))
       .children(open(section) ? rows(section) : []);
-    return v_flex().id("omarchy-keys")
-      .border_2().border_color(t.accent).rounded(0).size_full().min_h(0).p(12).gap(10).bg(t.popover).text_color(t.foreground)
+    return surface(t, v_flex()).id("omarchy-keys").size_full().min_h(0).p(UI.padding).gap(10).text_color(t.foreground)
       .on_key_down((e, cx) => { if (e.key === "escape") { closeOverlay(props().overlay); cx.stop_propagation(); } })
-      .child(h_flex().h(34).flex_none().px(10).gap(10).items_center().border_1().border_color(t.accent).bg(t.background)
+      .child(inputFrame(t, h_flex(), true).flex_none().gap(UI.gap).items_center()
         .child(svg("mods/omarchy-keys/keyboard.svg").size(15).text_color(t.dim))
         .child(Input.new(this.input).flex_1().h_full().text_size(12.8).text_color(t.foreground))
         .child(div().text_size(11).text_color(t.dim).child(`${all.length} keys · Esc`)))

@@ -3,10 +3,12 @@
 // ↑/↓ move, Enter runs, Esc closes. An item is [label, command, args];
 // a command "worktree" opens the worktree dialog instead.
 
+import { surface, menuRow } from "./ui.js";
+import { runOmarchy } from "./ui-actions.js";
 import { View, div, svg } from "gpui-kit";
 import { requestClose } from "./close.js";
 import { v_flex, h_flex } from "gpui-base";
-import { run, props, closeOverlay, openOverlay, theme, keys, terminals, spaces, panes, exec } from "herdr";
+import { props, closeOverlay, openOverlay, theme, keys, terminals, spaces, panes, exec } from "herdr";
 
 // Where a space is now: its first terminal's live folder, else where it was made.
 function place(s) {
@@ -113,22 +115,20 @@ export default class Menu extends View {
     const it = items(props(), this.git)[i];
     if (!it) return;
     closeOverlay(props()?.overlay);
-    if (it[1] === "worktree") openOverlay({ mod: "worktree", kind: "dialog", ...(it[2].action === "open" ? { width: 560, height: 480 } : { width: 440, height: 260 }), props: it[2] });
+    if (it[1] === "worktree") openOverlay({ frame: "none", mod: "omarchy-worktree", kind: "dialog", ...(it[2].action === "open" ? { width: 560, height: 480 } : { width: 440, height: 260 }), props: it[2] });
     else if (it[1] === "tab.close" || it[1] === "pane.close") requestClose(it[1], it[2]);
-    else run(it[1], it[2]);
+    else runOmarchy(it[1], it[2]);
   }
 
   render(cx) {
     const t = theme();
     const list = items(props(), this.git);
-    return v_flex()
+    return surface(t, v_flex(), "menu")
       .id("menu")
-      .border_1().border_color(t.border).rounded(0)
       .track_focus(this.handle)
       .w_full()
       .min_h(0)
       .p(5)
-      .bg(t.popover)
       .text_size(12.8)
       .on_key_down((e, cx) => {
         if (e.key === "down") this.at = (this.at + 1) % list.length;
@@ -142,21 +142,12 @@ export default class Menu extends View {
         list.map((it, i) =>
           v_flex()
             .when(i > 0 && (it[1].endsWith(".close") || it[1] === "app.help" || (it[1] === "app.theme" && list[i - 1][1] !== "app.theme")), el => el.child(div().mx(7).my(4).h(1).bg(t.border)))
-            .child(h_flex()
+            .child(menuRow(t, h_flex(), i === this.at)
             .id(`mi-${i}`)
-            .border_l(2).border_color(i === this.at ? t.accent : "#00000000")
-            .h(28)
-            .px(8)
-            .gap(9)
-            .rounded(0)
-            .items_center()
             .justify_between()
-            .text_color(t.foreground)
-            .when(i === this.at, (el) => el.bg(t.selected))
-            .hover((s) => s.bg(t.hover))
             .on_click((_e, cx) => this.choose(i, cx))
             .child(svg(menuIcon(it[1])).size(14).flex_none().text_color(t.muted))
-            .child(div().flex_1().child(it[0]))
+            .child(div().flex_1().min_w(0).truncate().child(it[0]))
             .child(div().text_size(11).text_color(t.dim).child(shortcut(it[1], it[2])))),
         ),
       );

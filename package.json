@@ -1,1 +1,9 @@
-{"name":"herdr-omarchy","private":true,"type":"module","scripts":{"test":"node --test tests/*.mjs"}}
+{
+  "name": "herdr-omarchy",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node scripts/sync-ui.mjs --check && node --test tests/*.mjs",
+    "sync-ui": "node scripts/sync-ui.mjs"
+  }
+}
