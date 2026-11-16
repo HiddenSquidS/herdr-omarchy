@@ -30,6 +30,8 @@ export function row(t, title, about, control) {
 export function button(t, id, label, onClick) {
   return div()
     .id(id)
+    .flex_none()
+    .whitespace_nowrap()
     .px(10)
     .h(30)
     .flex()
@@ -64,6 +66,8 @@ export function stepper(t, id, value, onMinus, onPlus) {
       .on_click(f)
       .child(label);
   return h_flex()
+    .flex_none()
+    .whitespace_nowrap()
     .items_center()
     .rounded(0)
     .border_1()
