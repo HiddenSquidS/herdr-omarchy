@@ -177,3 +177,17 @@ test('macOS keeps the theme wallpapers even when asked to follow', () =>
     await mod.matchWallpaper('test');
     assert.equal(state.current.background.image, 'backgrounds/omarchy/test/1.png');
   }));
+
+test('turning desktop wallpaper off restores the theme inside a wrapped Omarchy layout', () =>
+  desktopCase('linux', async (mod, state) => {
+    state.current = { id: 'wrapper', type: 'row', children: [
+      { id: 'root', background: { image: 'backgrounds/desktop/current-old.png', fit: 'cover' }, children: [] },
+      { id: 'other', children: [] },
+    ] };
+    await mod.matchWallpaper('test');
+    assert.equal(state.current.children[0].background.image, 'backgrounds/omarchy/test/1.png');
+    assert.equal(state.current.children[0].background.fit, 'cover');
+    assert.equal(state.current.background, undefined);
+    await mod.nextWallpaper();
+    assert.equal(state.current.children[0].background.image, 'backgrounds/omarchy/test/2.png');
+  }));
