@@ -25,7 +25,7 @@ export class Settings {
 
   render() {
     const t = theme(), tags = shared("omarchy-changes.graph.tags") === true;
-    return v_flex().id("git-graph-settings").size_full().p(12).gap(8).bg(t.popover).text_size(12.8).text_color(t.foreground)
+    return v_flex().id("git-graph-settings").size_full().p(12).gap(8).border_1().border_color(t.border).rounded(0).bg(t.popover).text_size(12.8).text_color(t.foreground)
       .on_key_down((e, cx) => { if (e.key === "escape") { closeOverlay(props().overlay); cx.stop_propagation(); } })
       .child(h_flex().h(30).gap(10).items_center()
         .child(div().flex_1().font_medium().child("Scan depth"))

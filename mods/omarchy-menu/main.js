@@ -123,6 +123,7 @@ export default class Menu extends View {
     const list = items(props(), this.git);
     return v_flex()
       .id("menu")
+      .border_1().border_color(t.border).rounded(0)
       .track_focus(this.handle)
       .w_full()
       .min_h(0)
@@ -143,7 +144,8 @@ export default class Menu extends View {
             .when(i > 0 && (it[1].endsWith(".close") || it[1] === "app.help" || (it[1] === "app.theme" && list[i - 1][1] !== "app.theme")), el => el.child(div().mx(7).my(4).h(1).bg(t.border)))
             .child(h_flex()
             .id(`mi-${i}`)
-            .h(31)
+            .border_l(2).border_color(i === this.at ? t.accent : "#00000000")
+            .h(28)
             .px(8)
             .gap(9)
             .rounded(0)

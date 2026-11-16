@@ -28,7 +28,7 @@ export async function perform(action, values, ctx, { toast = true } = {}) {
 export function openDialog(action, ctx) {
   const spec = dialogFor(action, ctx);
   if (!spec) return false;
-  openOverlay({ mod: "omarchy-changes", kind: "dialog", width: 420, height: dialogHeight(spec), props: { role: "dialog", action, ctx } });
+  openOverlay({ frame: "none", mod: "omarchy-changes", kind: "dialog", width: 420, height: dialogHeight(spec), props: { role: "dialog", action, ctx } });
   return true;
 }
 

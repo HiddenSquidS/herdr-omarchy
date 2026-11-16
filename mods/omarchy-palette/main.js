@@ -268,11 +268,12 @@ export default class Palette extends View {
     });
     return v_flex()
       .id("palette")
+      .border_2().border_color(t.accent).rounded(0)
       .track_focus(this.handle)
       .w_full()
       .min_h(0)
-      .p(18)
-      .gap(10)
+      .p(12)
+      .gap(8)
       .bg(t.popover)
       .on_key_down((e, cx) => {
         const k = e.key;
