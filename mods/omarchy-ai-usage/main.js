@@ -177,16 +177,6 @@ export default class AiUsage extends View {
     return el.size(size).flex_none().opacity(dim ? 0.5 : 1);
   }
 
-  tip(s) {
-    const u = shared(keyOf(s.id));
-    if (s.note) return `${s.agent}: ${s.note}`;
-    const ws = u?.windows ?? [];
-    const source = s.from?.omarchy === "codex" ? ` — ${s.sub}` : "";
-    return `${s.agent} (${s.label})${source}: ` + (ws.length
-      ? ws.map(w => `${w.long} ${w.used}%, ${resets(w)}`).join("; ") + (u.error ? ` (${u.error})` : "")
-      : u?.error ?? (u?.fetched ? "no limits reported" : "loading"));
-  }
-
   shell(el) {
     const t = theme(), edge = props()?.border;
     return el.id("root").size_full().items_center().bg(t.chrome).overflow_hidden()
@@ -200,8 +190,7 @@ export default class AiUsage extends View {
 
   clickable(el) {
     return el.on_mouse_down("left", (e, cx) => { this.anchor = e.bounds; cx.stop_propagation(); })
-      .on_click(() => this.open())
-      .tooltip(shownList().map(s => this.tip(s)).join("\n") || "No agent in view");
+      .on_click(() => this.open());
   }
 
   bar() {
