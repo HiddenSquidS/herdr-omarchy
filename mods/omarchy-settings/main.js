@@ -6,6 +6,7 @@ import { hc, run, theme, updates, telemetry, appHome, readTextFile, writeTextFil
 
 import { heading, row, button, toggle } from "./controls.js";
 import { DEFAULT_FONT, look } from "./look.js";
+import { layoutPreview } from "./preview.js";
 
 const I = (name) => `mods/omarchy-settings/${name}.svg`;
 
@@ -81,7 +82,7 @@ export default class Settings extends View {
       const found = {};
       for (const name of names) {
         try {
-          const preview = JSON.parse((await readTextFile(`${appHome()}/layouts/${name}.json`)) ?? "{}").preview;
+          const preview = layoutPreview(JSON.parse((await readTextFile(`${appHome()}/layouts/${name}.json`)) ?? "{}"));
           if (typeof preview === "string" && preview) found[name] = preview;
         } catch {}
       }
