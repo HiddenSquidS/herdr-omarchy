@@ -1,6 +1,7 @@
 // An action's dialog, opened with props { role: "dialog", action, ctx }: names
 // to type, options to tick, a mode to pick. Styled like Herdr's prompt and
 // confirm dialogs. Git's error stays in the dialog so the person can fix it.
+import { surface, button as uiButton, UI } from "../ui.js";
 import { div, svg } from "gpui-kit";
 import { v_flex, h_flex, InputState, Input } from "gpui-base";
 import { props, closeOverlay, theme } from "herdr";
@@ -54,11 +55,8 @@ export class Dialog {
   render() {
     const t = theme(), s = this.spec, danger = this.danger();
     const label = (text) => div().pt(14).pb(7).text_size(11.5).text_color(t.dim).child(text);
-    const button = (id, text, primary, action) => h_flex().id(id).h(32).px(14).items_center().rounded(0).border_1()
-      .border_color(primary ? (danger ? t.ansi1 : t.solid) : t.input).bg(primary ? (danger ? t.ansi1 : t.solid) : t.raised)
-      .text_color(primary ? (danger ? t.background : t.solid_foreground) : t.foreground).text_size(12.5).font_medium().cursor_pointer()
-      .hover((st) => st.opacity(0.88)).on_click(action).child(text);
-    return v_flex().id("git-graph-dialog").track_focus(this.handle).size_full().min_h(0).p(12).border_2().border_color(t.accent).rounded(0).bg(t.popover).text_color(t.foreground).text_size(12.8)
+    const button = (id, text, primary, action) => uiButton(t, id, text, action, primary ? (danger ? "danger" : "primary") : "secondary");
+    return surface(t, v_flex()).id("git-graph-dialog").track_focus(this.handle).size_full().min_h(0).p(UI.padding).text_color(t.foreground).text_size(12.8)
       .on_key_down((e, cx) => {
         if (e.key === "escape") closeOverlay(props().overlay);
         else if (e.key === "enter" && this.focusedInput < 0) this.confirm(cx);

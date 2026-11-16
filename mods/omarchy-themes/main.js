@@ -2,6 +2,7 @@
 // desktop preview, the chosen one large in the middle. ←/→ move, Enter applies, Esc closes.
 // omarchy-bar brings the theme's wallpaper.
 
+import { surface, UI } from "./ui.js";
 import { View, div, image } from "gpui-kit";
 import { v_flex, h_flex } from "gpui-base";
 import { themes, settings, run, theme, props, closeOverlay, appHome, readTextFile, writeTextFile } from "herdr";
@@ -59,7 +60,7 @@ export default class OmarchyThemes extends View {
       .child(div().absolute().inset_0().bg(`#000000${Math.round(0x30 + 0x18 * (Math.abs(by) - 1)).toString(16)}`));
     // Left: -count … -1; right: 1 … count, nearest next to the chosen one.
     const side = (sign) => Array.from({ length: count }, (_, i) => (sign < 0 ? i - count : i + 1)).map(strip);
-    return v_flex().id("omarchy-themes").track_focus(this.handle).size_full().gap(28).items_center().justify_center().bg("#000000cc")
+    return v_flex().id("omarchy-themes").track_focus(this.handle).size_full().gap(28).items_center().justify_center().bg(UI.scrim)
       .on_size_change((size, cx) => { this.size = size; cx.notify(); })
       .on_key_down((e, cx) => {
         const k = e.key;
@@ -72,7 +73,7 @@ export default class OmarchyThemes extends View {
       })
       .child(h_flex().items_center()
         .children(side(-1))
-        .child(div().id("th-chosen").flex_none().mx(10).border_3().border_color(t.accent).cursor_pointer().on_click(() => this.pick(chosen)).child(preview(chosen, W, H)))
+        .child(surface(t, div()).id("th-chosen").flex_none().mx(10).cursor_pointer().on_click(() => this.pick(chosen)).child(preview(chosen, W, H)))
         .children(side(1)))
       .child(h_flex().gap(12).items_center()
         .child(div().text_size(30).font_semibold().text_color("#ffffffee").child(chosen.name.split("-").map((w) => w[0].toUpperCase() + w.slice(1)).join(" ")))

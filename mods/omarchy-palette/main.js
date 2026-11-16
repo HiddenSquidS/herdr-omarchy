@@ -5,10 +5,12 @@
 // a name ask for it. Enter runs, ↑/↓ move, Esc closes.
 // The app's own mod: rewritten from the binary on every start.
 
+import { surface, inputFrame, UI } from "./ui.js";
+import { runOmarchy } from "./ui-actions.js";
 import { View, div, svg } from "gpui-kit";
 import { requestClose } from "./close.js";
 import { v_flex, h_flex, InputState, Input } from "gpui-base";
-import { commands, layouts, keys, run, theme, props, closeOverlay, openOverlay, shared, window as win } from "herdr";
+import { commands, layouts, keys, theme, props, closeOverlay, shared, window as win } from "herdr";
 
 // The list keeps one height while you move: rows and group titles have fixed
 // heights, and the window shows as many as fit in LIST_H.
@@ -153,15 +155,10 @@ export default class Palette extends View {
     this.recent = [e.id, ...this.recent.filter((r) => r !== e.id)].slice(0, 20);
     localStorage.setItem("recent", JSON.stringify(this.recent));
     this.close();
-    if (e.name === "mod.clone") {
-      openOverlay({ mod: "prompt", kind: "dialog", width: 380, props: {
-        title: "Duplicate mod", hint: "Mod to copy; creates <name>-copy",
-        command: { name: "mod.clone", args: {} },
-      } });
-    } else if (e.name === "tab.close" || e.name === "pane.close") {
+    if (e.name === "tab.close" || e.name === "pane.close") {
       requestClose(e.name, e.args);
     } else {
-      run(e.name, e.name === "layout.clone" ? { name: shared("layout") ?? "main" } : e.args);
+      runOmarchy(e.name, e.name === "layout.clone" ? { name: shared("layout") ?? "main" } : e.args);
     }
   }
 
@@ -266,15 +263,13 @@ export default class Palette extends View {
           .when(Boolean(k), (el) => el.child(key(k))),
       );
     });
-    return v_flex()
+    return surface(t, v_flex())
       .id("palette")
-      .border_2().border_color(t.accent).rounded(0)
       .track_focus(this.handle)
       .w_full()
       .min_h(0)
-      .p(12)
+      .p(UI.padding)
       .gap(8)
-      .bg(t.popover)
       .on_key_down((e, cx) => {
         const k = e.key;
         if (k === "escape") return this.close();
@@ -288,16 +283,7 @@ export default class Palette extends View {
         cx.notify();
       })
       .child(
-        h_flex()
-          .h(36)
-          .flex_none()
-          .px(10)
-          .gap(10)
-          .items_center()
-          .rounded(0)
-          .border_1()
-          .border_color(t.accent)
-          .bg(t.background)
+        inputFrame(t, h_flex(), true).flex_none().gap(UI.gap).items_center()
           .child(svg("mods/omarchy-palette/command.svg").size(16).text_color(t.dim))
           .child(Input.new(this.input).flex_1().h_full().text_size(12.8).text_color(t.foreground))
           .child(div().text_size(11).text_color(t.dim).child("Esc")),

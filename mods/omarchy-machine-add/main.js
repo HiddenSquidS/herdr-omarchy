@@ -6,6 +6,7 @@
 // (`mod.open machine-add`); the sidebars' Add machine and the welcome
 // open it.
 
+import { surface, UI } from "./ui.js";
 import { View, div, svg } from "gpui-kit";
 import { v_flex, h_flex, InputState, Input, TextView } from "gpui-base";
 import { hc, exec, home, readTextFile, theme, props, closeOverlay } from "herdr";
@@ -275,15 +276,13 @@ export default class MachineAdd extends View {
   render() {
     const t = theme();
     const hosts = this.hosts ?? [];
-    return v_flex()
+    return surface(t, v_flex())
       .id("machine-add")
-      .border_2().border_color(t.accent).rounded(0)
       .track_focus(this.handle)
       .on_key_down((e, cx) => this.key(e, cx))
       .w_full()
       .min_h(0)
-      .p(12)
-      .bg(t.popover)
+      .p(UI.padding)
       .text_color(t.foreground)
       .child(h_flex().items_center().child(div().flex_1().text_size(12).font_semibold().text_color(t.accent).child("ADD A MACHINE")).child(div().id("ma-esc").px(6).py(2).rounded(0).text_size(11).text_color(t.dim).cursor_pointer().hover((s) => s.bg(t.hover).text_color(t.foreground)).on_click(() => this.close()).child("Esc")))
       .child(

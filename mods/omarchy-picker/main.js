@@ -4,6 +4,7 @@
 // a tab, Esc to leave. Last rows: new work (a tab here, a space on this
 // computer or on each connected machine).
 
+import { surface, inputFrame, UI } from "./ui.js";
 import { View, div, svg } from "gpui-kit";
 import { v_flex, h_flex, InputState, Input } from "gpui-base";
 import { agents, spaces, terminals, run, hc, theme, settings, props, closeOverlay } from "herdr";
@@ -198,15 +199,13 @@ export default class Picker extends View {
         .child(div().text_size(11).text_color(t.dim).child(who + (r.team ? `  +${r.team}` : "")));
     };
 
-    return v_flex()
+    return surface(t, v_flex())
       .id("picker")
-      .border_2().border_color(t.accent).rounded(0)
       .track_focus(this.handle)
       .w_full()
       .min_h(0)
-      .p(12)
+      .p(UI.padding)
       .gap(8)
-      .bg(t.popover)
       .text_size(13)
       .on_key_down((e, cx) => {
         const k = e.key;
@@ -224,7 +223,7 @@ export default class Picker extends View {
       })
       .child(h_flex().items_center().child(div().flex_1().text_size(12).font_semibold().text_color(t.accent).child("GO TO")).child(div().id("picker-esc").px(6).py(2).rounded(0).text_size(11).text_color(t.dim).cursor_pointer().hover((s) => s.bg(t.hover).text_color(t.foreground)).on_click(() => this.close()).child("Esc")))
       .child(
-        h_flex().h(36).flex_none().px(10).gap(8).items_center().rounded(0).border_1().border_color(t.accent).bg(t.background)
+        inputFrame(t, h_flex(), true).flex_none().gap(UI.gap).items_center()
           .child(svg("mods/omarchy-picker/search.svg").size(15).text_color(t.dim))
           .child(Input.new(this.input).flex_1().h_full().text_size(12.8).text_color(t.foreground)),
       )

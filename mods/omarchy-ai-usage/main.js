@@ -1,3 +1,4 @@
+import { surface, UI } from "./ui.js";
 import { View, div, image, svg } from "gpui-kit";
 import { h_flex, v_flex } from "gpui-base";
 import { agents, exec, focused, home, panes, shared, setShared, props, openOverlay, settings, theme } from "herdr";
@@ -268,8 +269,7 @@ export default class AiUsage extends View {
           .child(div().text_size(11.5).text_color(t.dim).child(resets(w)))))
         .child(div().text_size(11.5).text_color(u?.error ? t.blocked : t.dim).child(footer));
     };
-    return v_flex().w_full().h(props().height ?? 0).when(!props().below, el => el.justify_end()).child(v_flex().w_full().p(14).gap(14).text_size(12).text_color(t.muted)
-      .bg(t.popover).border(1).border_color(t.border).rounded(0)
+    return v_flex().w_full().h(props().height ?? 0).when(!props().below, el => el.justify_end()).child(surface(t, v_flex()).w_full().p(UI.padding).gap(UI.gap).text_size(12).text_color(t.muted)
       .child(h_flex().justify_between().items_center()
         .child(div().text_size(13).font_semibold().text_color(t.foreground).child(idle ? "AI usage (last seen)" : "AI usage"))
         .child(div().id("refresh").px(6).py(2).rounded(0).text_color(t.dim).hover(s => s.bg(t.hover).text_color(t.foreground))

@@ -6,6 +6,10 @@
     "ctrl-down": "pane.go:down"
   },
   "layout:omarchy": {
+    "f2": "omarchy-dialog.rename-tab",
+    "shift-f2": "omarchy-dialog.rename-space",
+    "ctrl-shift-/": "mod.open:omarchy-keys",
+    "ctrl-shift-?": "mod.open:omarchy-keys",
     "ctrl-shift-p": "mod.open:omarchy-palette",
     "ctrl-,": "mod.open:omarchy-settings",
     "ctrl-shift-m": "mod.open:omarchy-mod-manager",

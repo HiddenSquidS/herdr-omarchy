@@ -4,6 +4,7 @@ export const GROUPS = ["Spaces", "Tabs", "Panes", "Agents", "Terminal", "Dialogs
 
 const DIRS = { left: "left", right: "right", up: "up", down: "down" };
 const FIXED = {
+  "omarchy-dialog.rename-tab": ["Tabs", "Rename tab"], "omarchy-dialog.rename-space": ["Spaces", "Rename space"],
   "omarchy-close.tab": ["Tabs", "Close tab"], "omarchy-close.pane": ["Panes", "Close pane"],
   "space.next": ["Spaces", "Next space"], "space.prev": ["Spaces", "Previous space"],
   "space.new": ["Spaces", "New space"], "space.rename": ["Spaces", "Rename space"],

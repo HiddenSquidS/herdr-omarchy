@@ -1,5 +1,6 @@
 // The gear's popup, opened with props { role: "settings" }: Manygit's scan depth
 // and whether rows show their newest tag. Each applies at once.
+import { surface, UI } from "../ui.js";
 import { div, svg } from "gpui-kit";
 import { v_flex, h_flex, InputState, Input } from "gpui-base";
 import { props, closeOverlay, theme, shared, setShared } from "herdr";
@@ -25,7 +26,7 @@ export class Settings {
 
   render() {
     const t = theme(), tags = shared("omarchy-changes.graph.tags") === true;
-    return v_flex().id("git-graph-settings").size_full().p(12).gap(8).border_1().border_color(t.border).rounded(0).bg(t.popover).text_size(12.8).text_color(t.foreground)
+    return surface(t, v_flex(), "menu").id("git-graph-settings").size_full().p(UI.padding).gap(8).text_size(12.8).text_color(t.foreground)
       .on_key_down((e, cx) => { if (e.key === "escape") { closeOverlay(props().overlay); cx.stop_propagation(); } })
       .child(h_flex().h(30).gap(10).items_center()
         .child(div().flex_1().font_medium().child("Scan depth"))

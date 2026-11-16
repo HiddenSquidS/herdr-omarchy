@@ -3,6 +3,7 @@
 // its first terminal is in now, only where unusual: branch, ahead/behind. Agent state lives in the agents list, not here. Click to
 // switch, right-click for its menu, drag to reorder.
 
+import { runOmarchy } from "./ui-actions.js";
 import { ScrollRail } from "./scroll-rail.js";
 import { View, div, svg } from "gpui-kit";
 import { v_flex, h_flex } from "gpui-base";
@@ -377,7 +378,7 @@ export default class Spaces extends View {
         } else {
           this.arming = null;
           this.hovered = null;
-          run("space.close", { id: w.id, confirmed: armed });
+          runOmarchy("space.close", { id: w.id, confirmed: armed });
         }
         cx.notify();
       })

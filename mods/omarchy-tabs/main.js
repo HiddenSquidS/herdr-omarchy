@@ -1,4 +1,5 @@
 // auto-tabs: herdr's tab bar (cloned) with wider names; names.js names the tabs.
+import { runOmarchy } from "./ui-actions.js";
 import { View, div, svg, image } from "gpui-kit";
 import { h_flex } from "gpui-base";
 import { syncNames } from "./names.js";
@@ -214,7 +215,7 @@ export default class Tabs extends View {
         .when(c.active, el => el.border_2().border_color(t.accent)).when(!c.active, el => el.border_r(1).border_color(t.border))
         .bg(c.active ? t.background : idle).text_color(c.active ? t.foreground : t.muted)
         .hover(s => s.bg(c.active ? t.background : hov))
-        .on_mouse_down("left", (e, cx) => { cx.stop_propagation(); this.pressed = i; if (e.click_count === 2) run("tab.rename", { id: c.id }); })
+        .on_mouse_down("left", (e, cx) => { cx.stop_propagation(); this.pressed = i; if (e.click_count === 2) runOmarchy("tab.rename", { id: c.id }); })
         .on_mouse_up("left", () => {
           const from = this.pressed; this.pressed = null;
           if (from !== null && from !== i) run("tab.move", { id: shown[from].id, index: space.tabs.findIndex(x => x.id === c.id) + 1 });
@@ -256,7 +257,7 @@ export default class Tabs extends View {
       .child(h_flex().id("tab-scroll").max_w((shown.length - 1) * tabW + tabA).flex_shrink(1).min_w(0).h_full().items_center().gap(0).overflow_x_scrollbar().children(shown.map(item)))
       .child(div().id("tab-new").h_full().w(36).flex_none().flex().items_center().justify_center().rounded(0).border_r(1).border_color(t.border).bg(idle).text_color(t.dim)
         .hover(s => s.bg(hov).text_color(t.foreground)).on_mouse_down("left", stop)
-        .on_click(() => openOverlay({ mod: "new-menu", kind: "popup", width: 250, height: 512 })).child("+"))
+        .on_click(() => openOverlay({ frame: "none", mod: "omarchy-new-menu", kind: "popup", width: 250, height: 512 })).child("+"))
       .child(div().flex_1())
       .child(h_flex().id("tab-panels").h_full().gap(0).items_center().flex_none().on_size_change(measure("panels"))
       .when(enabled.includes("files"), el => el.child(panelButton("files", "Files", "mods/omarchy-tabs/icons/files.svg")))
