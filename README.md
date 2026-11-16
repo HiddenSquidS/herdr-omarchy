@@ -125,3 +125,5 @@ herdr-app check mods/omarchy-settings
 
 > [!TIP]
 > Your edits in this repo do not change the copy in `~/.config/herdr-app`. Copy the changed files there to see them in Herdr.
+
+Closing the final tab or pane through Omarchy controls keeps its space open with a replacement shell in its latest folder. Explicit Close space still removes it. Typing `exit` and external terminal kills bypass this guard.

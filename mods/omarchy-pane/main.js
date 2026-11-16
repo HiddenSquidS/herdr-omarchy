@@ -14,6 +14,7 @@ import { View, div, svg, image } from "gpui-kit";
 import { h_flex, InputState, Input } from "gpui-base";
 import { panes, props, run, theme, home, exec, layout, shared, setShared, window, focused, nextCommand, readTextFile, watchFolder } from "herdr";
 import { act, readLive, watchLive, touches } from "./browser/client.js";
+import { requestClose } from "./close.js";
 
 function icon(p, size, color) {
   if (!p?.icon) return null;
@@ -213,7 +214,8 @@ export default class Pane extends View {
       .hover((s) => s.bg(t.foreground + "14").border_color(t.foreground + "40").text_color(t.foreground))
       .on_click((_e, cx) => {
         cx.stop_propagation();
-        run(command, args);
+        if (command === "pane.close") requestClose(command, args);
+        else run(command, args);
       })
       .child(svg(`mods/omarchy-pane/${icon}.svg`).size(14));
   }
