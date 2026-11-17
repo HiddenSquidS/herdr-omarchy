@@ -79,6 +79,18 @@ export default class OmarchyBar extends View {
     return this.left(row, t);
   }
 
+  fit(narrow, buttons) {
+    this.narrow = narrow;
+    this.buttons = buttons;
+    const sizes = narrow
+      ? [["bar-left", { weight: 1 }], ["ai-usage", { weight: 2 }], ["bar-right", { px: buttons ? 90 : 0 }]]
+      : [["bar-left", { weight: 3 }], ["ai-usage", { weight: 2.5 }], ["bar-right", { px: buttons ? 90 : 0 }]];
+    for (const [id, size] of sizes) {
+      const current = find(layout(), id)?.size;
+      if (current && (current.px !== size.px || current.weight !== size.weight)) run("layout.resize", { id, ...size });
+    }
+  }
+
   left(row, t) {
     const name = settings().theme;
     if (name !== this.theme) {
@@ -98,18 +110,14 @@ export default class OmarchyBar extends View {
     const sep = () => div().flex_none().mx(10).text_color(t.border).child("│");
     // macOS draws its window buttons over this corner; leave them room.
     const w = window();
+    // Toggling the system title bar adds or removes the bar's window buttons.
+    const buttons = Boolean(w?.buttons);
+    if (this.narrow !== undefined && buttons !== this.buttons) this.fit(this.narrow, buttons);
     return row.pl(w?.platform === "macos" && !w.fullscreen ? 76 : 4)
       .on_size_change((_size, cx) => {
         const narrow = globalThis.window.viewport_size().width < 1024;
         if (narrow !== this.narrow) {
-          this.narrow = narrow;
-          const sizes = narrow
-            ? [["bar-left", { weight: 1 }], ["ai-usage", { weight: 2 }], ["bar-right", { px: w?.buttons ? 90 : 0 }]]
-            : [["bar-left", { weight: 3 }], ["ai-usage", { weight: 2.5 }], ["bar-right", { px: w?.buttons ? 90 : 0 }]];
-          for (const [id, size] of sizes) {
-            const current = find(layout(), id)?.size;
-            if (current && (current.px !== size.px || current.weight !== size.weight)) run("layout.resize", { id, ...size });
-          }
+          this.fit(narrow, buttons);
           cx.notify();
         }
       })
