@@ -86,6 +86,7 @@ function entries() {
   const list = NAMED.filter(([n]) => known.has(n))
     .filter(([n]) => !(mac && n.startsWith("window.")))
     .map(([name, args, group, title, words]) => ({ name, args, group, title, words }));
+  if (!mac) list.push({ name: "window.titlebar", args: {}, group: "Window", title: win()?.titlebar === "none" ? "Show system title bar" : "Hide system title bar", words: "native toolbar titlebar decorations" });
   for (const l of layouts()) {
     const t = { main: "Herdr", terminals: "Terminals", win98: "Herdr 98" }[l] ?? l.charAt(0).toUpperCase() + l.slice(1);
     list.push({ name: "layout.switch", args: { name: l }, group: "Layout", title: `Layout: ${t}`, words: `look ${l}` });

@@ -47,7 +47,7 @@ test('update: main ahead is flagged, applied without losing the person\'s keys, 
     });
     await put(app, {
       'keys.json': { 'layout:omarchy': { k1: 'mine' }, global: { g: 'x' } },
-      'layouts/omarchy.json': { background: { image: 'mine.webp' }, theme: { dark: 'x', light: 'y' }, v: 0 },
+      'layouts/omarchy.json': { background: { image: 'mine.webp' }, theme: { dark: 'x', light: 'y' }, titlebar: 'system', v: 0 },
     });
     const mod = await import(`data:text/javascript;base64,${Buffer.from(source
       .replace(/import .* from "herdr";/, 'const { exec, home, appHome, readTextFile, writeTextFile, shared, setShared, notify, window } = globalThis.updateTest;')
@@ -77,7 +77,7 @@ test('update: main ahead is flagged, applied without losing the person\'s keys, 
 
     await mod.applyUpdate();
     assert.equal(await readFile(`${app}/mods/omarchy-a/main.js`, 'utf8'), 'a2');
-    assert.deepEqual(await json('layouts/omarchy.json'), { background: { image: 'mine.webp', fit: 'cover' }, theme: { dark: 'x', light: 'y' }, v: 2 });
+    assert.deepEqual(await json('layouts/omarchy.json'), { background: { image: 'mine.webp', fit: 'cover' }, theme: { dark: 'x', light: 'y' }, titlebar: 'system', v: 2 });
     assert.equal((await stat(`${app}/themes/x.json`)).mtimeMs, themeTime, 'unchanged files are not rewritten');
     assert.equal(store[mod.RECORD].sha, second);
 

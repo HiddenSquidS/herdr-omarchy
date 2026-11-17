@@ -1,10 +1,18 @@
-import { focused, spaces, openOverlay, run } from "herdr";
+import { focused, spaces, openOverlay, run, layout, exec } from "herdr";
 
 export function showDialog(spec) {
   return openOverlay({ mod: "omarchy-dialog", kind: "dialog", frame: "none", width: 420, height: spec.mode === "prompt" ? (spec.hint ? 180 : 160) : (spec.detail ? 150 : 130), props: spec });
 }
 
+// Through the CLI: run() refuses an argument nested deeper than 16 levels, and the layout's tree is deeper.
+function toggleTitlebar() {
+  const l = layout();
+  if (!l) return;
+  return exec("herdr-app", ["do", "layout.set", JSON.stringify({ layout: { ...l, titlebar: l.titlebar === "none" ? "system" : "none" } })]);
+}
+
 export function runOmarchy(name, args = {}) {
+  if (name === "window.titlebar") return toggleTitlebar();
   if (name === "space.close" && !args.confirmed) {
     const space = spaces().find(s => s.id === (args.id ?? focused()?.space));
     if (!space) return;

@@ -70,7 +70,7 @@ async function mergeKeys(dir) {
   if (added) await writeTextFile(file, JSON.stringify(theirs, null, 2) + "\n", raw);
 }
 
-// The layout file also holds the person's wallpaper and theme pair, so it is only replaced when
+// The layout file also holds the person's wallpaper, theme pair and title bar choice, so it is only replaced when
 // main changed it, and those two stay. Without a record of the last update it stays as it is.
 async function updateLayout(dir, blob) {
   const last = shared(RECORD)?.layout;
@@ -82,6 +82,7 @@ async function updateLayout(dir, blob) {
   const mine = parse(raw);
   if (mine?.background?.image) next.background = { ...next.background, image: mine.background.image };
   if (mine?.theme) next.theme = mine.theme;
+  if (mine?.titlebar) next.titlebar = mine.titlebar;
   await writeTextFile(file, JSON.stringify(next, null, 2) + "\n", raw);
 }
 

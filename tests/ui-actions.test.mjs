@@ -13,6 +13,8 @@ function harness() {
     ],
     run: (...args) => state.calls.push(args),
     openOverlay: spec => { state.dialogs.push(spec); return 'dialog-id'; },
+    layout: () => state.layout,
+    exec: (...args) => state.calls.push(['exec', ...args]),
   };
   vm.createContext(context);
   const source = readFileSync(new URL('../ui/actions.js', import.meta.url), 'utf8').replace(/^import .*\n/gm, '').replaceAll('export ', '');
@@ -98,4 +100,14 @@ test('confirmation cancel has no command side effects; Enter executes its captur
   assert.equal(state.calls[1][0], 'space.close');
   assert.equal(state.calls[1][1].id, 'one');
   assert.equal(state.calls[1][1].confirmed, true);
+});
+
+test('title bar toggle flips the layout between the system bar and none', () => {
+  const { state, action } = harness();
+  state.layout = { id: 'root', titlebar: 'none', children: [] };
+  action('window.titlebar');
+  state.layout = { id: 'root', children: [] };
+  action('window.titlebar');
+  const sent = state.calls.map(([, cmd, args]) => { assert.equal(cmd, 'herdr-app'); assert.equal(args.slice(0, 2).join(' '), 'do layout.set'); return JSON.parse(args[2]).layout.titlebar; });
+  assert.deepEqual(sent, ['system', 'none']);
 });
