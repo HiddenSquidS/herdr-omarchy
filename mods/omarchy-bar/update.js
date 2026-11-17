@@ -70,8 +70,8 @@ async function mergeKeys(dir) {
   if (added) await writeTextFile(file, JSON.stringify(theirs, null, 2) + "\n", raw);
 }
 
-// The layout file also holds the person's wallpaper, theme pair and title bar choice, so it is only replaced when
-// main changed it, and those two stay. Without a record of the last update it stays as it is.
+// The layout file also holds the person's wallpaper, theme pair and title bar choice, so it is
+// only replaced when main changed it, and those stay. Without a record of the last update it stays as it is.
 async function updateLayout(dir, blob) {
   const last = shared(RECORD)?.layout;
   if (!last || last === blob) return;
