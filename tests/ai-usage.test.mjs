@@ -16,6 +16,7 @@ function usageHarness(files = {}, response = {}, status = 200, settings = {}, pr
     focused: () => live.focused ?? null,
     panes: () => live.panes ?? [],
     agents: () => live.agents ?? [],
+    terminals: () => live.terminals ?? [],
     exec: async (...args) => (live.exec ? live.exec(...args) : { code: 1, stdout: '', stderr: '' }),
     readTextFile: async path => {
       reads.push(path);
@@ -45,7 +46,7 @@ function usageHarness(files = {}, response = {}, status = 200, settings = {}, pr
   };
 }
 
-const agent = key => ({ terminal: 't1', program: { key, name: key, icon: `${key}.svg`, tint: true } });
+const agent = key => ({ terminal: 't1', program: { key, name: key, icon: `${key}.svg`, tint: true, agent: true } });
 const claude = { id: 'claude.claude', provider: 'claude', agent: 'Claude', from: { claude: '/home/test/.claude' } };
 const codex = { id: 'codex', provider: 'codex', agent: 'Codex', from: { codex: true } };
 const copilot = { id: 'copilot', provider: 'copilot', agent: 'Copilot', from: { copilot: true } };
@@ -123,6 +124,51 @@ test('Claude account routing keeps work and personal sources separate', async ()
   assert.equal(personal.from.claude, '/home/test/.claude-personal');
 });
 
+test('Pi follows live model changes in the same pane, not its default provider', async () => {
+  const terminal = { address: 't1', foreground: { pid: 10 }, labels: {} };
+  const live = {
+    focused: { tab: 'tab1', terminal: 't1' },
+    panes: [{ ...agent('pi'), tab: 'tab1', focused: true }],
+    terminals: [terminal],
+  };
+  const h = usageHarness({
+    '/home/test/.pi/agent/settings.json': { defaultProvider: 'openai-codex' },
+    '/home/test/.pi/agent/auth.json': { 'openai-codex': { type: 'oauth', access: 'pi-token' } },
+  }, {}, 200, {}, {}, live);
+  const view = new h.AiUsage();
+  const shown = () => h.state.get('omarchy-ai-usage.shown').list[0];
+  let pending;
+  const cx = { timer: { every() {} }, spawn: task => { pending = task(); } };
+  view.init({}, cx);
+  terminal.labels['omarchy.pi-model'] = JSON.stringify(['openai-codex', 'gpt-sol', 10, true]);
+  view.sync(cx);
+  await pending;
+  assert.equal(shown().model, 'gpt-sol');
+  assert.equal(shown().provider, 'codex');
+  terminal.labels['omarchy.pi-model'] = JSON.stringify(['litellm', 'qwen', 10, false]);
+  view.sync(cx);
+  await pending;
+  assert.equal(shown().model, 'qwen');
+  assert.equal(shown().note, 'litellm: no usage API');
+  assert.equal(shown().provider, undefined);
+  terminal.foreground.pid++;
+  view.sync(cx);
+  await pending;
+  assert.equal(shown().note, 'model unavailable');
+  assert.equal(h.requests.length, 1);
+});
+
+test('Pi does not borrow local quota for an alternate profile or remote pane', async () => {
+  const h = usageHarness();
+  for (const [terminal, defaultProfile] of [['t1', false], ['remote/t1', true]]) {
+    const [source] = await h.route({ ...agent('pi'), terminal, piModel: ['openai-codex', 'gpt-sol', 10, defaultProfile] });
+    assert.equal(source.model, 'gpt-sol');
+    assert.equal(source.note, 'quota unavailable for this Pi profile');
+    assert.equal(source.provider, undefined);
+  }
+  assert.deepEqual(h.reads, []);
+});
+
 test('Pi shares Codex login only when account IDs match', async () => {
   for (const accountId of ['same', 'different']) {
     const h = usageHarness({
@@ -130,7 +176,7 @@ test('Pi shares Codex login only when account IDs match', async () => {
       '/home/test/.pi/agent/auth.json': { 'openai-codex': { type: 'oauth', accountId, access: 'pi-token' } },
       '/home/test/.codex/auth.json': { tokens: { account_id: 'same' } },
     });
-    const [source] = await h.route(agent('pi'));
+    const [source] = await h.route({ ...agent('pi'), piModel: ['openai-codex', 'gpt-sol', 10, true] });
     assert.equal(source.id, accountId === 'same' ? 'codex' : 'pi.codex');
     assert.deepEqual(source.from, accountId === 'same' ? { codex: true } : { harness: 'pi', entry: 'openai-codex' });
   }
@@ -174,7 +220,7 @@ test('Pi Copilot OAuth uses refresh token for the usage endpoint', async () => {
     '/home/test/.pi/agent/settings.json': { defaultProvider: 'github-copilot' },
     '/home/test/.pi/agent/auth.json': { 'github-copilot': { type: 'oauth', refresh: 'refresh-token', access: 'access-token' } },
   });
-  const [source] = await h.route(agent('pi'));
+  const [source] = await h.route({ ...agent('pi'), piModel: ['github-copilot', 'gpt-sol', 10, true] });
   await h.refreshOne(source);
   assert.equal(source.id, 'pi.copilot');
   assert.equal(h.requests[0].headers.Authorization, 'token refresh-token');

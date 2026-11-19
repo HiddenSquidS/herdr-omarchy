@@ -23,6 +23,8 @@ The Omarchy desktop, rebuilt inside Herdr. Your terminals and coding agents sit 
 - **Updates from `main`.** Herdr checks this repo's `main` when it starts and every 6 hours. When there is something new, the sidebar's Mods row shows a dot and Mod Manager marks the layout's mods `↑ UPDATE`; press Update there, or Update all (`U`) for every package with an update. Your keys, wallpaper and theme pair stay. Not on Windows.
 - **Square dialogs that match.** The command palette, Settings, the go-to picker, notifications, right-click menus, a Keybindings list and a mod manager that browses, reviews and installs community mods all share the same look.
 
+For live Pi model usage, install the [Pi extension](extensions/herdr-ai-usage.ts) into `~/.pi/agent/extensions/` (or the profile’s `extensions/` directory), then run `/reload` in Pi. It tells Herdr which model is active in each pane. The bar shows the model and, where supported on the local default Pi profile, the provider account’s quota. It does not show per-model token spend.
+
 OpenCode uses its original model-based OAuth route by default. To opt into Omarchy agents' cached Codex quota for an OpenAI OpenCode provider, add `usage_source: "omarchy"` to the `ai-usage` block's `content.props` in an existing `layouts/omarchy.json`, keeping `compact: true`:
 
 ```json

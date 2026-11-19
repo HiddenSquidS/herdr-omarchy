@@ -66,7 +66,7 @@ export const PROVIDERS = {
 
 // Multi-provider harnesses: which provider they use, and where their logins live.
 const HARNESS = {
-  pi: { auth: ".pi/agent/auth.json", pick: async () => (await json(".pi/agent/settings.json"))?.defaultProvider },
+  pi: { auth: ".pi/agent/auth.json" },
   opencode: { auth: ".local/share/opencode/auth.json" },
 };
 const UNDER = { anthropic: "claude", "openai-codex": "codex", openai: "codex", "github-copilot": "copilot" };
@@ -160,23 +160,30 @@ export async function sourcesFor(v, claudeDirOf, usageSource, isCurrent = () => 
   if (key === "copilot") return [{ id: "copilot", provider: "copilot", agent, label: "copilot", sub: "GitHub Copilot", icon, tint, from: { copilot: true } }];
   const h = HARNESS[key];
   if (!h) return [labelled(v)];
-  const config = key === "opencode" ? await json(".config/opencode/opencode.json") : null;
-  const entry = key === "opencode" ? (typeof config?.model === "string" ? config.model.split("/")[0] : null) : await h.pick();
+  const isPi = key === "pi";
+  const [piProvider, model, , defaultProfile] = v.piModel ?? [];
+  if (isPi && !model) return [labelled(v, "model unavailable")];
+  const fields = isPi ? { model } : {};
+  const config = isPi ? null : await json(".config/opencode/opencode.json");
+  const entry = isPi ? piProvider : (typeof config?.model === "string" ? config.model.split("/")[0] : null);
   if (!isCurrent()) return [];
   if (key === "opencode" && usageSource === "omarchy"
       && (entry === "openai" || (!entry && config?.providers?.openai))) return [omarchySource(v)];
   if (!isCurrent()) return [];
-  const auth = (await json(h.auth))?.[entry];
-  const provider = UNDER[entry];
+  const provider = Object.hasOwn(UNDER, entry) ? UNDER[entry] : null;
+  if (isPi && provider && (defaultProfile !== true || v.terminal?.includes("/"))) {
+    return [{ ...labelled(v, "quota unavailable for this Pi profile"), ...fields }];
+  }
+  const auth = provider ? (await json(h.auth))?.[entry] : null;
   if (!provider || auth?.type !== "oauth") {
-    const source = labelled(v, `${entry ?? "its provider"}: no usage API`);
+    const source = { ...labelled(v, `${entry ?? "its provider"}: no usage API`), ...fields };
     return key === "opencode" ? [{ ...source, from: { harness: key, entry: entry ?? null } }] : [source];
   }
   // Same ChatGPT account as Codex's own login: share its numbers and its fresher token.
   if (provider === "codex" && auth.accountId && auth.accountId === (await json(".codex/auth.json"))?.tokens?.account_id) {
-    return [{ id: "codex", provider, agent, label: key, sub: `via ${entry} (Codex login)`, icon, tint, from: { codex: true, ...(key === "opencode" ? { harness: key, entry } : {}) } }];
+    return [{ ...fields, id: "codex", provider, agent, label: key, sub: `via ${entry} (Codex login)`, icon, tint, from: { codex: true, ...(key === "opencode" ? { harness: key, entry } : {}) } }];
   }
-  return [{ id: `${key}.${provider}`, provider, agent, label: key, sub: `via ${entry}`, icon, tint, from: { harness: key, entry } }];
+  return [{ ...fields, id: `${key}.${provider}`, provider, agent, label: key, sub: `via ${entry}`, icon, tint, from: { harness: key, entry } }];
 }
 
 export async function fetchUsage(src, withMetadata = false) {
