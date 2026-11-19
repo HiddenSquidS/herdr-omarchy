@@ -188,6 +188,7 @@ export default class Agents extends View {
     const on = k.address === shown;
     return h_flex()
       .id(`sub-${k.address}`)
+      .tooltip(k.address)
       .pl(39)
       .pr(8)
       .rounded(0)
@@ -343,8 +344,6 @@ export default class Agents extends View {
     const row = (a, i, subs = []) => {
       const pic = icon(a.program, 16, t.foreground);
       const more = detail.get(a.address);
-      // An agent on another machine (`vps/t7`) says which.
-      const machine = a.address.includes("/") ? a.address.split("/")[0] : null;
       // The 44px rail: the program's icon in a square, status as a corner square ("!" when it needs you).
       if (collapsed) {
         const corner = a.status === "blocked" ? div().absolute().top(1).right(1).size(11).bg(t.blocked).text_size(8.5).font_bold().text_color(t.background).flex().items_center().justify_center().child("!")
@@ -362,7 +361,7 @@ export default class Agents extends View {
           .border(1)
           .text_size(11)
           .font_bold()
-          .tooltip([label(a), more, machine].filter(Boolean).join(" \u00b7 "))
+          .tooltip([label(a), more, a.address].filter(Boolean).join(" \u00b7 "))
           .when(a.focused, (el) => el.bg(t.foreground + "2e").border_color(t.foreground + "40"))
           .when(!a.focused, (el) => el.border_color(t.border).hover((s) => s.bg(t.foreground + "14").border_color(t.foreground + "40")))
           .on_click(() => run("pane.focus", { pane: a.pane }))
@@ -398,11 +397,9 @@ export default class Agents extends View {
       const also = full ? more ?? (a.space_name !== where ? a.space_name : null) : more ? where : null;
       // Two cut-off halves ("flexspring-wizar… · …") read as broken: the second shows only when both fit whole.
       const fitsMore = Boolean(also) && also !== name && (name?.length ?? 0) + also.length + 3 <= room();
-      // A hover balloon with the whole name, only when the row had to cut something off.
-      const cut = (name?.length ?? 0) > room() || (Boolean(also) && also !== name && !fitsMore);
       return h_flex()
         .id(`ag-${a.address}`)
-        .when(cut, el => el.tooltip([name, also !== name ? also : null, machine].filter(Boolean).join(" · ")))
+        .tooltip([name, also !== name ? also : null, a.address].filter(Boolean).join(" · "))
         .relative()
         .px(squeezed ? 6 : 8)
         .h(26)

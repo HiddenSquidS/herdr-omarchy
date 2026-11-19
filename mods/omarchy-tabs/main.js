@@ -208,7 +208,7 @@ export default class Tabs extends View {
       // Compact tabs: they share the strip and shrink toward TAB_MIN before it scrolls.
       // The status word lives in the hover balloon; the tab keeps only its dot or spinner.
       return h_flex().id(`tab-${c.id}`).w(c.active ? tabA : tabW).flex_none().h_full().px(8).gap(6).rounded(0).items_center().text_size(12)
-        .tooltip([name, detail].filter(Boolean).join("\n"))
+        .tooltip([name, detail, tabPanes.map(p => p.terminal).filter(Boolean).join(", ")].filter(Boolean).join("\n"))
         // The close button shows on the active tab and on the one under the pointer.
         .on_hover((over, cx) => { if (over) this.overTab = c.id; else if (this.overTab === c.id) this.overTab = null; cx.notify(); })
         // Matches the pane's focus frame.
