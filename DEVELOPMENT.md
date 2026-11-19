@@ -75,4 +75,4 @@ Edit `ui/components.js` for surfaces, headings, controls, inputs and menu rows. 
 
 Herdr rejects imports outside a mod folder. `scripts/sync-ui.mjs` distributes the shared sources into each consuming mod as generated `ui.js` and `ui-actions.js`. Do not edit those generated copies. `npm test` checks that they match the sources. The distributed files keep each mod independently installable.
 
-`omarchy-dialog` supplies confirmation and text prompts. Its layout-owned controller handles rename shortcuts; dialog actions capture their target before opening. New-tab and worktree dialogs use `omarchy-new-menu` and `omarchy-worktree` rather than Herdr's built-in views.
+`omarchy-dialog` supplies confirmation and text prompts. Its layout-owned controller handles rename shortcuts; dialog actions capture their target before opening. Worktree dialogs use `omarchy-worktree` rather than Herdr's built-in views. The tab strip `+` runs `tab.new` directly.

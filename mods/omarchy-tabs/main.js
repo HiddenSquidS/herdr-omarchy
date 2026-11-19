@@ -257,7 +257,7 @@ export default class Tabs extends View {
       .child(h_flex().id("tab-scroll").max_w((shown.length - 1) * tabW + tabA).flex_shrink(1).min_w(0).h_full().items_center().gap(0).overflow_x_scrollbar().children(shown.map(item)))
       .child(div().id("tab-new").h_full().w(36).flex_none().flex().items_center().justify_center().rounded(0).border_r(1).border_color(t.border).bg(idle).text_color(t.dim)
         .hover(s => s.bg(hov).text_color(t.foreground)).on_mouse_down("left", stop)
-        .on_click(() => openOverlay({ frame: "none", mod: "omarchy-new-menu", kind: "popup", width: 250, height: 512 })).child("+"))
+        .on_click(() => run("tab.new", { space: space?.id })).child("+"))
       .child(div().flex_1())
       .child(h_flex().id("tab-panels").h_full().gap(0).items_center().flex_none().on_size_change(measure("panels"))
       .when(enabled.includes("files"), el => el.child(panelButton("files", "Files", "mods/omarchy-tabs/icons/files.svg")))
