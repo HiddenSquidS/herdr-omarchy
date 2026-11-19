@@ -1,7 +1,7 @@
 import { surface, UI } from "./ui.js";
 import { View, div, image, svg } from "gpui-kit";
 import { h_flex, v_flex } from "gpui-base";
-import { agents, exec, focused, home, panes, shared, setShared, props, openOverlay, settings, theme } from "herdr";
+import { agents, exec, focused, home, panes, terminals, shared, setShared, props, openOverlay, settings, theme } from "herdr";
 
 import { PROVIDERS, sourcesFor, fetchUsage } from "./providers.js";
 import { clock, pace, resets, resetsShort } from "./time.js";
@@ -36,10 +36,13 @@ const shownList = () => shared(SHOWN)?.list ?? [];
 const isOpenCodeSource = src => src.from?.harness === "opencode"
   || (src.id === "none.opencode" && src.agent === "OpenCode")
   || (src.id === "codex" && src.agent === "OpenCode" && src.label === "opencode" && src.from?.codex === true);
-const sourceSignature = (vis, usageSource) => `${vis.map(v => `${v.terminal}:${v.program.key}`).join(",")}|${usageSource ?? ""}`;
+const sourceSignature = (vis, usageSource) => `${vis.map(v => JSON.stringify([v.terminal, v.program.key, v.piModel])).join(",")}|${usageSource ?? ""}`;
 const uniqueSources = list => {
   const sources = new Map();
-  for (const src of list) if (!sources.has(src.id)) sources.set(src.id, src);
+  for (const src of list) {
+    const key = JSON.stringify([src.id, src.model]);
+    if (!sources.has(key)) sources.set(key, src);
+  }
   return [...sources.values()];
 };
 const due = src => src.provider && Date.now() - (Date.parse(shared(keyOf(src.id))?.checked ?? "") || 0) >= EVERY;
@@ -55,6 +58,17 @@ function visible() {
   const list = ps.map(p => ({ terminal: p.terminal, program: p.program, focused: p.focused }));
   const block = f.terminal && !list.some(v => v.terminal === f.terminal) && agents().find(a => a.address === f.terminal);
   if (block) list.push({ terminal: block.address, program: block.program, focused: true });
+  const all = list.some(v => v.program.key === "pi") ? terminals() : [];
+  for (const v of list) {
+    if (v.program.key !== "pi") continue;
+    const t = all.find(t => t.address === v.terminal);
+    try {
+      const model = JSON.parse(t?.labels?.["omarchy.pi-model"] ?? "null");
+      if (Array.isArray(model) && typeof model[0] === "string" && model[0]
+          && typeof model[1] === "string" && model[1]
+          && Number.isInteger(model[2]) && model[2] === t.foreground?.pid) v.piModel = model;
+    } catch {}
+  }
   return list.sort((a, b) => b.focused - a.focused);
 }
 
@@ -202,7 +216,7 @@ export default class AiUsage extends View {
       const ws = (u?.windows ?? []).slice(0, 2);
       return h_flex().h(19).gap(6).items_center().flex_none()
         .child(this.icon(s, 13, stale))
-        .child(div().w(64).flex_none().whitespace_nowrap().font_semibold().text_color(stale ? t.dim : t.foreground).child(s.label))
+        .child(div().w(s.model ? 112 : 64).flex_none().truncate().font_semibold().text_color(stale ? t.dim : t.foreground).child(s.model ?? s.label))
         .when(Boolean(s.note) || !ws.length, el => el.child(div().text_color(t.dim).child(s.note ?? (u?.error ? "no data" : u?.fetched ? "no limits" : "…"))))
         .children(ws.map(w => h_flex().gap(4).items_center().flex_none()
           .child(div().text_color(t.dim).child(w.short))
@@ -235,7 +249,7 @@ export default class AiUsage extends View {
       return h_flex().gap(6).items_center().flex_none()
         .child(this.icon(s, 12, stale))
         // The profile's name, so a work and a personal Claude tell apart.
-        .when(s.provider === "claude", el => el.child(div().whitespace_nowrap().text_color(stale ? t.dim : t.foreground).child(s.label)))
+        .when(s.model || s.provider === "claude", el => el.child(div().whitespace_nowrap().text_color(stale ? t.dim : t.foreground).child(s.model ?? s.label)))
         .when(Boolean(s.note) || !first, el => el.child(div().whitespace_nowrap().text_color(t.dim).child(s.note ?? (u?.error ? "no data" : u?.fetched ? "no limits" : "…"))))
         .when(Boolean(first), el => el.child(win(first)))
         .when(Boolean(second), el => el.child(win(second)));
@@ -260,7 +274,7 @@ export default class AiUsage extends View {
         .child(h_flex().gap(6).items_center().min_w(0)
           .child(this.icon(s, 14, stale))
           .child(div().flex_none().text_size(12.5).font_bold().text_color(t.foreground).child(title(s)))
-          .when(Boolean(s.sub), el => el.child(div().flex_1().min_w(0).truncate().text_size(11.5).text_color(t.dim).child(s.sub))))
+          .when(Boolean(s.sub), el => el.child(div().flex_1().min_w(0).truncate().text_size(11.5).text_color(t.dim).child(s.model ? `${s.model} · ${s.sub}` : s.sub))))
         .children((u?.windows ?? []).map(w => v_flex().gap(6)
           .child(h_flex().justify_between().items_end()
             .child(div().text_color(t.foreground).child(w.long))
@@ -283,6 +297,7 @@ const clamp = v => Math.min(100, Math.max(0, v ?? 0));
 // "Codex · codex" says it twice; add the label only when it names something more (a Claude account, "pi").
 const title = s => {
   const name = s.provider ? PROVIDERS[s.provider].name : s.label;
+  if (s.model && !s.provider) return `${name} · ${s.model}`;
   return s.provider && s.label.toLowerCase() !== name.toLowerCase() ? `${name} · ${s.label}` : name;
 };
 
