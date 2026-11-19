@@ -397,6 +397,7 @@ export default class Agents extends View {
       const also = full ? more ?? (a.space_name !== where ? a.space_name : null) : more ? where : null;
       // Two cut-off halves ("flexspring-wizar… · …") read as broken: the second shows only when both fit whole.
       const fitsMore = Boolean(also) && also !== name && (name?.length ?? 0) + also.length + 3 <= room();
+      const machine = a.address.includes("/") ? a.address.split("/")[0] : null;
       return h_flex()
         .id(`ag-${a.address}`)
         .tooltip([name, also !== name ? also : null, a.address].filter(Boolean).join(" · "))
